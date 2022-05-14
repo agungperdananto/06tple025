@@ -78,3 +78,6 @@ class Produksi():
         inferensi_values = self.inferensi(jumlah_permintaan, jumlah_persediaan)
         return sum([(value[0]* value[1]) for value in inferensi_values]) / sum([value[0] for value in inferensi_values])
 # Permintaan = 4000 & Persediaan 300
+
+
+# https://www.slideshare.net/ZaenalKhayat/contoh-peyelesaian-logika-fuzzy
