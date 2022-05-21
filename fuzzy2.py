@@ -26,23 +26,34 @@ class Permintaan():
 
 class Persediaan():
     minimum = 100
-    maximum = 250
+    medium = 300
+    maximum = 500
 
     def sedikit(self, x):
-        if x >= self.maximum:
+        if x >= self.medium:
             return 0
         elif x <= self.minimum:
             return 1
         else:
-            return down(x, self.minimum, self.maximum)
+            return down(x, self.minimum, self.medium)
+    
+    def cukup(self, x):
+        if self.minimum < x < self.medium:
+            return up(x, self.minimum, self.medium)
+        elif self.medium < x < self.maximum:
+            return down(x, self.medium, self.maximum)
+        elif x == self.medium:
+            return 1
+        else:
+            return 0
 
     def banyak(self, x):
         if x >= self.maximum:
             return 1
-        elif x <= self.minimum:
+        elif x <= self.medium:
             return 0
         else:
-            return up(x, self.minimum, self.maximum)
+            return up(x, self.medium, self.maximum)
 
 class Produksi():
     minimum = 1000
@@ -54,7 +65,7 @@ class Produksi():
     def tambah(self, α):
         return α *(self.maximum - self.minimum) + self.minimum
 
-    # 2 permintaan 2 persediaan
+    # 2 permintaan 3 persediaan
     def inferensi(self, jumlah_permintaan, jumlah_persediaan):
         pmt = Permintaan()
         psd = Persediaan()
@@ -79,12 +90,21 @@ class Produksi():
         α4 = min(pmt.naik(jumlah_permintaan), psd.sedikit(jumlah_persediaan))
         z4 = self.tambah(α4)
         result.append((α4, z4))
+
+        # [R5] JIKA Permintaan NAIK, dan Persediaan CUKUP,
+        #     MAKA Produksi Barang BERKURANG.
+        α5 = min(pmt.naik(jumlah_permintaan), psd.cukup(jumlah_persediaan))
+        z5 = self.kurang(α5)
+        result.append((α5, z5))
+
+        # [R6] JIKA Permintaan NAIK, dan Persediaan CUKUP,
+        #     MAKA Produksi Barang BERKURANG.
+        α6 = min(pmt.turun(jumlah_permintaan), psd.cukup(jumlah_persediaan))
+        z6 = self.tambah(α6)
+        result.append((α6, z6))
+
         return result
     
     def defuzifikasi(self, jumlah_permintaan, jumlah_persediaan):
         inferensi_values = self.inferensi(jumlah_permintaan, jumlah_persediaan)
         return sum([(value[0]* value[1]) for value in inferensi_values]) / sum([value[0] for value in inferensi_values])
-# Permintaan = 3200 & Persediaan 140
-
-
-# https://www.slideshare.net/ZaenalKhayat/contoh-peyelesaian-logika-fuzzy
